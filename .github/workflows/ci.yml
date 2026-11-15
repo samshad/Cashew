@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BASE: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: docker build --target sdk -t sdk .
+      - name: Format (added files)
+        run: ci/check.sh format
+      - name: No new analyzer issues
+        run: ci/check.sh analyze
+      - name: Duplicate code (added files)
+        run: ci/check.sh duplicates
+      - name: Build
+        run: docker build .
