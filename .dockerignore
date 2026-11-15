@@ -1,0 +1,6 @@
+*
+!budget
+budget/build
+budget/.dart_tool
+budget/android
+budget/ios
