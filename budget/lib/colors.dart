@@ -623,6 +623,9 @@ ThemeData getLightTheme() {
     fontFamilyFallback: ['Inter'],
     colorScheme: getColorScheme(brightness),
     useMaterial3: true,
+    canvasColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
+    scaffoldBackgroundColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
+    dialogBackgroundColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
     applyElevationOverlayColor: false,
     typography: Typography.material2014(),
     splashColor: getPlatform() == PlatformOS.isIOS
@@ -657,6 +660,9 @@ ThemeData getDarkTheme() {
     fontFamilyFallback: ['Inter'],
     colorScheme: getColorScheme(brightness),
     useMaterial3: true,
+    canvasColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
+    scaffoldBackgroundColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
+    dialogBackgroundColor: getColorScheme(brightness).background, // Client: Flutter 3.22+ defaults this to surface
     typography: Typography.material2014(),
     splashColor: getPlatform() == PlatformOS.isIOS
         ? Colors.transparent
