@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8080:80"
+
+  tools:
+    profiles: [tools]
+    build:
+      context: .
+      target: sdk
+    volumes:
+      - ./budget:/app
