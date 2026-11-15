@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # The app does not use drift's manager API; skip it to keep tables.g.dart lean.
+          generate_manager: false

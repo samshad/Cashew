@@ -78,8 +78,6 @@ class $WalletsTable extends Wallets
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(2));
-  static const VerificationMeta _homePageWidgetDisplayMeta =
-      const VerificationMeta('homePageWidgetDisplay');
   @override
   late final GeneratedColumnWithTypeConverter<List<HomePageWidgetDisplay>?,
       String> homePageWidgetDisplay = GeneratedColumn<String>(
@@ -163,8 +161,6 @@ class $WalletsTable extends Wallets
       context.handle(_decimalsMeta,
           decimals.isAcceptableOrUnknown(data['decimals']!, _decimalsMeta));
     }
-    context.handle(
-        _homePageWidgetDisplayMeta, const VerificationResult.success());
     return context;
   }
 
@@ -262,9 +258,9 @@ class TransactionWallet extends DataClass
     }
     map['decimals'] = Variable<int>(decimals);
     if (!nullToAbsent || homePageWidgetDisplay != null) {
-      final converter = $WalletsTable.$converterhomePageWidgetDisplayn;
-      map['home_page_widget_display'] =
-          Variable<String>(converter.toSql(homePageWidgetDisplay));
+      map['home_page_widget_display'] = Variable<String>($WalletsTable
+          .$converterhomePageWidgetDisplayn
+          .toSql(homePageWidgetDisplay));
     }
     return map;
   }
@@ -365,6 +361,29 @@ class TransactionWallet extends DataClass
             ? homePageWidgetDisplay.value
             : this.homePageWidgetDisplay,
       );
+  TransactionWallet copyWithCompanion(WalletsCompanion data) {
+    return TransactionWallet(
+      walletPk: data.walletPk.present ? data.walletPk.value : this.walletPk,
+      name: data.name.present ? data.name.value : this.name,
+      colour: data.colour.present ? data.colour.value : this.colour,
+      iconName: data.iconName.present ? data.iconName.value : this.iconName,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      order: data.order.present ? data.order.value : this.order,
+      currency: data.currency.present ? data.currency.value : this.currency,
+      currencyFormat: data.currencyFormat.present
+          ? data.currencyFormat.value
+          : this.currencyFormat,
+      decimals: data.decimals.present ? data.decimals.value : this.decimals,
+      homePageWidgetDisplay: data.homePageWidgetDisplay.present
+          ? data.homePageWidgetDisplay.value
+          : this.homePageWidgetDisplay,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TransactionWallet(')
@@ -550,10 +569,9 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
       map['decimals'] = Variable<int>(decimals.value);
     }
     if (homePageWidgetDisplay.present) {
-      final converter = $WalletsTable.$converterhomePageWidgetDisplayn;
-
-      map['home_page_widget_display'] =
-          Variable<String>(converter.toSql(homePageWidgetDisplay.value));
+      map['home_page_widget_display'] = Variable<String>($WalletsTable
+          .$converterhomePageWidgetDisplayn
+          .toSql(homePageWidgetDisplay.value));
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -651,8 +669,6 @@ class $CategoriesTable extends Categories
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("income" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _methodAddedMeta =
-      const VerificationMeta('methodAdded');
   @override
   late final GeneratedColumnWithTypeConverter<MethodAdded?, int> methodAdded =
       GeneratedColumn<int>('method_added', aliasedName, true,
@@ -741,7 +757,6 @@ class $CategoriesTable extends Categories
       context.handle(_incomeMeta,
           income.isAcceptableOrUnknown(data['income']!, _incomeMeta));
     }
-    context.handle(_methodAddedMeta, const VerificationResult.success());
     if (data.containsKey('main_category_pk')) {
       context.handle(
           _mainCategoryPkMeta,
@@ -840,8 +855,8 @@ class TransactionCategory extends DataClass
     map['order'] = Variable<int>(order);
     map['income'] = Variable<bool>(income);
     if (!nullToAbsent || methodAdded != null) {
-      final converter = $CategoriesTable.$convertermethodAddedn;
-      map['method_added'] = Variable<int>(converter.toSql(methodAdded));
+      map['method_added'] = Variable<int>(
+          $CategoriesTable.$convertermethodAddedn.toSql(methodAdded));
     }
     if (!nullToAbsent || mainCategoryPk != null) {
       map['main_category_pk'] = Variable<String>(mainCategoryPk);
@@ -943,6 +958,31 @@ class TransactionCategory extends DataClass
         mainCategoryPk:
             mainCategoryPk.present ? mainCategoryPk.value : this.mainCategoryPk,
       );
+  TransactionCategory copyWithCompanion(CategoriesCompanion data) {
+    return TransactionCategory(
+      categoryPk:
+          data.categoryPk.present ? data.categoryPk.value : this.categoryPk,
+      name: data.name.present ? data.name.value : this.name,
+      colour: data.colour.present ? data.colour.value : this.colour,
+      iconName: data.iconName.present ? data.iconName.value : this.iconName,
+      emojiIconName: data.emojiIconName.present
+          ? data.emojiIconName.value
+          : this.emojiIconName,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      order: data.order.present ? data.order.value : this.order,
+      income: data.income.present ? data.income.value : this.income,
+      methodAdded:
+          data.methodAdded.present ? data.methodAdded.value : this.methodAdded,
+      mainCategoryPk: data.mainCategoryPk.present
+          ? data.mainCategoryPk.value
+          : this.mainCategoryPk,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TransactionCategory(')
@@ -1123,9 +1163,8 @@ class CategoriesCompanion extends UpdateCompanion<TransactionCategory> {
       map['income'] = Variable<bool>(income.value);
     }
     if (methodAdded.present) {
-      final converter = $CategoriesTable.$convertermethodAddedn;
-
-      map['method_added'] = Variable<int>(converter.toSql(methodAdded.value));
+      map['method_added'] = Variable<int>(
+          $CategoriesTable.$convertermethodAddedn.toSql(methodAdded.value));
     }
     if (mainCategoryPk.present) {
       map['main_category_pk'] = Variable<String>(mainCategoryPk.value);
@@ -1170,7 +1209,6 @@ class $ObjectivesTable extends Objectives
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => uuid.v4());
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumnWithTypeConverter<ObjectiveType, int> type =
       GeneratedColumn<int>('type', aliasedName, false,
@@ -1308,7 +1346,6 @@ class $ObjectivesTable extends Objectives
           objectivePk.isAcceptableOrUnknown(
               data['objective_pk']!, _objectivePkMeta));
     }
-    context.handle(_typeMeta, const VerificationResult.success());
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -1461,8 +1498,7 @@ class Objective extends DataClass implements Insertable<Objective> {
     final map = <String, Expression>{};
     map['objective_pk'] = Variable<String>(objectivePk);
     {
-      final converter = $ObjectivesTable.$convertertype;
-      map['type'] = Variable<int>(converter.toSql(type));
+      map['type'] = Variable<int>($ObjectivesTable.$convertertype.toSql(type));
     }
     map['name'] = Variable<String>(name);
     map['amount'] = Variable<double>(amount);
@@ -1601,6 +1637,32 @@ class Objective extends DataClass implements Insertable<Objective> {
         archived: archived ?? this.archived,
         walletFk: walletFk ?? this.walletFk,
       );
+  Objective copyWithCompanion(ObjectivesCompanion data) {
+    return Objective(
+      objectivePk:
+          data.objectivePk.present ? data.objectivePk.value : this.objectivePk,
+      type: data.type.present ? data.type.value : this.type,
+      name: data.name.present ? data.name.value : this.name,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      order: data.order.present ? data.order.value : this.order,
+      colour: data.colour.present ? data.colour.value : this.colour,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      iconName: data.iconName.present ? data.iconName.value : this.iconName,
+      emojiIconName: data.emojiIconName.present
+          ? data.emojiIconName.value
+          : this.emojiIconName,
+      income: data.income.present ? data.income.value : this.income,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+      archived: data.archived.present ? data.archived.value : this.archived,
+      walletFk: data.walletFk.present ? data.walletFk.value : this.walletFk,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Objective(')
@@ -1798,9 +1860,8 @@ class ObjectivesCompanion extends UpdateCompanion<Objective> {
       map['objective_pk'] = Variable<String>(objectivePk.value);
     }
     if (type.present) {
-      final converter = $ObjectivesTable.$convertertype;
-
-      map['type'] = Variable<int>(converter.toSql(type.value));
+      map['type'] =
+          Variable<int>($ObjectivesTable.$convertertype.toSql(type.value));
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1982,8 +2043,6 @@ class $TransactionsTable extends Transactions
   late final GeneratedColumn<int> periodLength = GeneratedColumn<int>(
       'period_length', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _reoccurrenceMeta =
-      const VerificationMeta('reoccurrence');
   @override
   late final GeneratedColumnWithTypeConverter<BudgetReoccurence?, int>
       reoccurrence = GeneratedColumn<int>('reoccurrence', aliasedName, true,
@@ -2007,7 +2066,6 @@ class $TransactionsTable extends Transactions
           defaultConstraints: GeneratedColumn.constraintIsAlways(
               'CHECK ("upcoming_transaction_notification" IN (0, 1))'),
           defaultValue: const Constant(true));
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumnWithTypeConverter<TransactionSpecialType?, int>
       type = GeneratedColumn<int>('type', aliasedName, true,
@@ -2044,8 +2102,6 @@ class $TransactionsTable extends Transactions
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("skip_paid" IN (0, 1))'),
       defaultValue: const Constant(false));
-  static const VerificationMeta _methodAddedMeta =
-      const VerificationMeta('methodAdded');
   @override
   late final GeneratedColumnWithTypeConverter<MethodAdded?, int> methodAdded =
       GeneratedColumn<int>('method_added', aliasedName, true,
@@ -2077,8 +2133,6 @@ class $TransactionsTable extends Transactions
   late final GeneratedColumn<String> sharedOldKey = GeneratedColumn<String>(
       'shared_old_key', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _sharedStatusMeta =
-      const VerificationMeta('sharedStatus');
   @override
   late final GeneratedColumnWithTypeConverter<SharedStatus?, int> sharedStatus =
       GeneratedColumn<int>('shared_status', aliasedName, true,
@@ -2115,8 +2169,6 @@ class $TransactionsTable extends Transactions
       requiredDuringInsert: false,
       defaultConstraints: GeneratedColumn.constraintIsAlways(
           'REFERENCES objectives (objective_pk)'));
-  static const VerificationMeta _budgetFksExcludeMeta =
-      const VerificationMeta('budgetFksExclude');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       budgetFksExclude = GeneratedColumn<String>(
@@ -2244,7 +2296,6 @@ class $TransactionsTable extends Transactions
           periodLength.isAcceptableOrUnknown(
               data['period_length']!, _periodLengthMeta));
     }
-    context.handle(_reoccurrenceMeta, const VerificationResult.success());
     if (data.containsKey('end_date')) {
       context.handle(_endDateMeta,
           endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta));
@@ -2256,7 +2307,6 @@ class $TransactionsTable extends Transactions
               data['upcoming_transaction_notification']!,
               _upcomingTransactionNotificationMeta));
     }
-    context.handle(_typeMeta, const VerificationResult.success());
     if (data.containsKey('paid')) {
       context.handle(
           _paidMeta, paid.isAcceptableOrUnknown(data['paid']!, _paidMeta));
@@ -2272,7 +2322,6 @@ class $TransactionsTable extends Transactions
       context.handle(_skipPaidMeta,
           skipPaid.isAcceptableOrUnknown(data['skip_paid']!, _skipPaidMeta));
     }
-    context.handle(_methodAddedMeta, const VerificationResult.success());
     if (data.containsKey('transaction_owner_email')) {
       context.handle(
           _transactionOwnerEmailMeta,
@@ -2296,7 +2345,6 @@ class $TransactionsTable extends Transactions
           sharedOldKey.isAcceptableOrUnknown(
               data['shared_old_key']!, _sharedOldKeyMeta));
     }
-    context.handle(_sharedStatusMeta, const VerificationResult.success());
     if (data.containsKey('shared_date_updated')) {
       context.handle(
           _sharedDateUpdatedMeta,
@@ -2322,7 +2370,6 @@ class $TransactionsTable extends Transactions
           objectiveLoanFk.isAcceptableOrUnknown(
               data['objective_loan_fk']!, _objectiveLoanFkMeta));
     }
-    context.handle(_budgetFksExcludeMeta, const VerificationResult.success());
     return context;
   }
 
@@ -2528,8 +2575,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       map['period_length'] = Variable<int>(periodLength);
     }
     if (!nullToAbsent || reoccurrence != null) {
-      final converter = $TransactionsTable.$converterreoccurrencen;
-      map['reoccurrence'] = Variable<int>(converter.toSql(reoccurrence));
+      map['reoccurrence'] = Variable<int>(
+          $TransactionsTable.$converterreoccurrencen.toSql(reoccurrence));
     }
     if (!nullToAbsent || endDate != null) {
       map['end_date'] = Variable<DateTime>(endDate);
@@ -2539,8 +2586,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           Variable<bool>(upcomingTransactionNotification);
     }
     if (!nullToAbsent || type != null) {
-      final converter = $TransactionsTable.$convertertypen;
-      map['type'] = Variable<int>(converter.toSql(type));
+      map['type'] =
+          Variable<int>($TransactionsTable.$convertertypen.toSql(type));
     }
     map['paid'] = Variable<bool>(paid);
     if (!nullToAbsent || createdAnotherFutureTransaction != null) {
@@ -2549,8 +2596,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     }
     map['skip_paid'] = Variable<bool>(skipPaid);
     if (!nullToAbsent || methodAdded != null) {
-      final converter = $TransactionsTable.$convertermethodAddedn;
-      map['method_added'] = Variable<int>(converter.toSql(methodAdded));
+      map['method_added'] = Variable<int>(
+          $TransactionsTable.$convertermethodAddedn.toSql(methodAdded));
     }
     if (!nullToAbsent || transactionOwnerEmail != null) {
       map['transaction_owner_email'] = Variable<String>(transactionOwnerEmail);
@@ -2566,8 +2613,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       map['shared_old_key'] = Variable<String>(sharedOldKey);
     }
     if (!nullToAbsent || sharedStatus != null) {
-      final converter = $TransactionsTable.$convertersharedStatusn;
-      map['shared_status'] = Variable<int>(converter.toSql(sharedStatus));
+      map['shared_status'] = Variable<int>(
+          $TransactionsTable.$convertersharedStatusn.toSql(sharedStatus));
     }
     if (!nullToAbsent || sharedDateUpdated != null) {
       map['shared_date_updated'] = Variable<DateTime>(sharedDateUpdated);
@@ -2583,9 +2630,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       map['objective_loan_fk'] = Variable<String>(objectiveLoanFk);
     }
     if (!nullToAbsent || budgetFksExclude != null) {
-      final converter = $TransactionsTable.$converterbudgetFksExcluden;
-      map['budget_fks_exclude'] =
-          Variable<String>(converter.toSql(budgetFksExclude));
+      map['budget_fks_exclude'] = Variable<String>($TransactionsTable
+          .$converterbudgetFksExcluden
+          .toSql(budgetFksExclude));
     }
     return map;
   }
@@ -2858,6 +2905,82 @@ class Transaction extends DataClass implements Insertable<Transaction> {
             ? budgetFksExclude.value
             : this.budgetFksExclude,
       );
+  Transaction copyWithCompanion(TransactionsCompanion data) {
+    return Transaction(
+      transactionPk: data.transactionPk.present
+          ? data.transactionPk.value
+          : this.transactionPk,
+      pairedTransactionFk: data.pairedTransactionFk.present
+          ? data.pairedTransactionFk.value
+          : this.pairedTransactionFk,
+      name: data.name.present ? data.name.value : this.name,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      note: data.note.present ? data.note.value : this.note,
+      categoryFk:
+          data.categoryFk.present ? data.categoryFk.value : this.categoryFk,
+      subCategoryFk: data.subCategoryFk.present
+          ? data.subCategoryFk.value
+          : this.subCategoryFk,
+      walletFk: data.walletFk.present ? data.walletFk.value : this.walletFk,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      originalDateDue: data.originalDateDue.present
+          ? data.originalDateDue.value
+          : this.originalDateDue,
+      income: data.income.present ? data.income.value : this.income,
+      periodLength: data.periodLength.present
+          ? data.periodLength.value
+          : this.periodLength,
+      reoccurrence: data.reoccurrence.present
+          ? data.reoccurrence.value
+          : this.reoccurrence,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      upcomingTransactionNotification:
+          data.upcomingTransactionNotification.present
+              ? data.upcomingTransactionNotification.value
+              : this.upcomingTransactionNotification,
+      type: data.type.present ? data.type.value : this.type,
+      paid: data.paid.present ? data.paid.value : this.paid,
+      createdAnotherFutureTransaction:
+          data.createdAnotherFutureTransaction.present
+              ? data.createdAnotherFutureTransaction.value
+              : this.createdAnotherFutureTransaction,
+      skipPaid: data.skipPaid.present ? data.skipPaid.value : this.skipPaid,
+      methodAdded:
+          data.methodAdded.present ? data.methodAdded.value : this.methodAdded,
+      transactionOwnerEmail: data.transactionOwnerEmail.present
+          ? data.transactionOwnerEmail.value
+          : this.transactionOwnerEmail,
+      transactionOriginalOwnerEmail: data.transactionOriginalOwnerEmail.present
+          ? data.transactionOriginalOwnerEmail.value
+          : this.transactionOriginalOwnerEmail,
+      sharedKey: data.sharedKey.present ? data.sharedKey.value : this.sharedKey,
+      sharedOldKey: data.sharedOldKey.present
+          ? data.sharedOldKey.value
+          : this.sharedOldKey,
+      sharedStatus: data.sharedStatus.present
+          ? data.sharedStatus.value
+          : this.sharedStatus,
+      sharedDateUpdated: data.sharedDateUpdated.present
+          ? data.sharedDateUpdated.value
+          : this.sharedDateUpdated,
+      sharedReferenceBudgetPk: data.sharedReferenceBudgetPk.present
+          ? data.sharedReferenceBudgetPk.value
+          : this.sharedReferenceBudgetPk,
+      objectiveFk:
+          data.objectiveFk.present ? data.objectiveFk.value : this.objectiveFk,
+      objectiveLoanFk: data.objectiveLoanFk.present
+          ? data.objectiveLoanFk.value
+          : this.objectiveLoanFk,
+      budgetFksExclude: data.budgetFksExclude.present
+          ? data.budgetFksExclude.value
+          : this.budgetFksExclude,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Transaction(')
@@ -3271,9 +3394,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       map['period_length'] = Variable<int>(periodLength.value);
     }
     if (reoccurrence.present) {
-      final converter = $TransactionsTable.$converterreoccurrencen;
-
-      map['reoccurrence'] = Variable<int>(converter.toSql(reoccurrence.value));
+      map['reoccurrence'] = Variable<int>(
+          $TransactionsTable.$converterreoccurrencen.toSql(reoccurrence.value));
     }
     if (endDate.present) {
       map['end_date'] = Variable<DateTime>(endDate.value);
@@ -3283,9 +3405,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           Variable<bool>(upcomingTransactionNotification.value);
     }
     if (type.present) {
-      final converter = $TransactionsTable.$convertertypen;
-
-      map['type'] = Variable<int>(converter.toSql(type.value));
+      map['type'] =
+          Variable<int>($TransactionsTable.$convertertypen.toSql(type.value));
     }
     if (paid.present) {
       map['paid'] = Variable<bool>(paid.value);
@@ -3298,9 +3419,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       map['skip_paid'] = Variable<bool>(skipPaid.value);
     }
     if (methodAdded.present) {
-      final converter = $TransactionsTable.$convertermethodAddedn;
-
-      map['method_added'] = Variable<int>(converter.toSql(methodAdded.value));
+      map['method_added'] = Variable<int>(
+          $TransactionsTable.$convertermethodAddedn.toSql(methodAdded.value));
     }
     if (transactionOwnerEmail.present) {
       map['transaction_owner_email'] =
@@ -3317,9 +3437,8 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       map['shared_old_key'] = Variable<String>(sharedOldKey.value);
     }
     if (sharedStatus.present) {
-      final converter = $TransactionsTable.$convertersharedStatusn;
-
-      map['shared_status'] = Variable<int>(converter.toSql(sharedStatus.value));
+      map['shared_status'] = Variable<int>(
+          $TransactionsTable.$convertersharedStatusn.toSql(sharedStatus.value));
     }
     if (sharedDateUpdated.present) {
       map['shared_date_updated'] = Variable<DateTime>(sharedDateUpdated.value);
@@ -3335,10 +3454,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       map['objective_loan_fk'] = Variable<String>(objectiveLoanFk.value);
     }
     if (budgetFksExclude.present) {
-      final converter = $TransactionsTable.$converterbudgetFksExcluden;
-
-      map['budget_fks_exclude'] =
-          Variable<String>(converter.toSql(budgetFksExclude.value));
+      map['budget_fks_exclude'] = Variable<String>($TransactionsTable
+          .$converterbudgetFksExcluden
+          .toSql(budgetFksExclude.value));
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -3433,22 +3551,16 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
   late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
       'end_date', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _walletFksMeta =
-      const VerificationMeta('walletFks');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String> walletFks =
       GeneratedColumn<String>('wallet_fks', aliasedName, true,
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<List<String>?>($BudgetsTable.$converterwalletFksn);
-  static const VerificationMeta _categoryFksMeta =
-      const VerificationMeta('categoryFks');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       categoryFks = GeneratedColumn<String>('category_fks', aliasedName, true,
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<List<String>?>($BudgetsTable.$convertercategoryFksn);
-  static const VerificationMeta _categoryFksExcludeMeta =
-      const VerificationMeta('categoryFksExclude');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       categoryFksExclude = GeneratedColumn<String>(
@@ -3491,8 +3603,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
   late final GeneratedColumn<int> periodLength = GeneratedColumn<int>(
       'period_length', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _reoccurrenceMeta =
-      const VerificationMeta('reoccurrence');
   @override
   late final GeneratedColumnWithTypeConverter<BudgetReoccurence?, int>
       reoccurrence = GeneratedColumn<int>('reoccurrence', aliasedName, true,
@@ -3539,8 +3649,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES wallets (wallet_pk)'),
       defaultValue: const Constant("0"));
-  static const VerificationMeta _budgetTransactionFiltersMeta =
-      const VerificationMeta('budgetTransactionFilters');
   @override
   late final GeneratedColumnWithTypeConverter<List<BudgetTransactionFilters>?,
       String> budgetTransactionFilters = GeneratedColumn<String>(
@@ -3550,8 +3658,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
           defaultValue: const Constant(null))
       .withConverter<List<BudgetTransactionFilters>?>(
           $BudgetsTable.$converterbudgetTransactionFiltersn);
-  static const VerificationMeta _memberTransactionFiltersMeta =
-      const VerificationMeta('memberTransactionFilters');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       memberTransactionFilters = GeneratedColumn<String>(
@@ -3567,8 +3673,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
   late final GeneratedColumn<String> sharedKey = GeneratedColumn<String>(
       'shared_key', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _sharedOwnerMemberMeta =
-      const VerificationMeta('sharedOwnerMember');
   @override
   late final GeneratedColumnWithTypeConverter<SharedOwnerMember?, int>
       sharedOwnerMember = GeneratedColumn<int>(
@@ -3582,16 +3686,12 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
   late final GeneratedColumn<DateTime> sharedDateUpdated =
       GeneratedColumn<DateTime>('shared_date_updated', aliasedName, true,
           type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _sharedMembersMeta =
-      const VerificationMeta('sharedMembers');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       sharedMembers = GeneratedColumn<String>(
               'shared_members', aliasedName, true,
               type: DriftSqlType.string, requiredDuringInsert: false)
           .withConverter<List<String>?>($BudgetsTable.$convertersharedMembersn);
-  static const VerificationMeta _sharedAllMembersEverMeta =
-      const VerificationMeta('sharedAllMembersEver');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>?, String>
       sharedAllMembersEver = GeneratedColumn<String>(
@@ -3681,9 +3781,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
     } else if (isInserting) {
       context.missing(_endDateMeta);
     }
-    context.handle(_walletFksMeta, const VerificationResult.success());
-    context.handle(_categoryFksMeta, const VerificationResult.success());
-    context.handle(_categoryFksExcludeMeta, const VerificationResult.success());
     if (data.containsKey('income')) {
       context.handle(_incomeMeta,
           income.isAcceptableOrUnknown(data['income']!, _incomeMeta));
@@ -3706,7 +3803,6 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
     } else if (isInserting) {
       context.missing(_periodLengthMeta);
     }
-    context.handle(_reoccurrenceMeta, const VerificationResult.success());
     if (data.containsKey('date_created')) {
       context.handle(
           _dateCreatedMeta,
@@ -3733,24 +3829,16 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, Budget> {
       context.handle(_walletFkMeta,
           walletFk.isAcceptableOrUnknown(data['wallet_fk']!, _walletFkMeta));
     }
-    context.handle(
-        _budgetTransactionFiltersMeta, const VerificationResult.success());
-    context.handle(
-        _memberTransactionFiltersMeta, const VerificationResult.success());
     if (data.containsKey('shared_key')) {
       context.handle(_sharedKeyMeta,
           sharedKey.isAcceptableOrUnknown(data['shared_key']!, _sharedKeyMeta));
     }
-    context.handle(_sharedOwnerMemberMeta, const VerificationResult.success());
     if (data.containsKey('shared_date_updated')) {
       context.handle(
           _sharedDateUpdatedMeta,
           sharedDateUpdated.isAcceptableOrUnknown(
               data['shared_date_updated']!, _sharedDateUpdatedMeta));
     }
-    context.handle(_sharedMembersMeta, const VerificationResult.success());
-    context.handle(
-        _sharedAllMembersEverMeta, const VerificationResult.success());
     if (data.containsKey('is_absolute_spending_limit')) {
       context.handle(
           _isAbsoluteSpendingLimitMeta,
@@ -3955,25 +4043,25 @@ class Budget extends DataClass implements Insertable<Budget> {
     map['start_date'] = Variable<DateTime>(startDate);
     map['end_date'] = Variable<DateTime>(endDate);
     if (!nullToAbsent || walletFks != null) {
-      final converter = $BudgetsTable.$converterwalletFksn;
-      map['wallet_fks'] = Variable<String>(converter.toSql(walletFks));
+      map['wallet_fks'] =
+          Variable<String>($BudgetsTable.$converterwalletFksn.toSql(walletFks));
     }
     if (!nullToAbsent || categoryFks != null) {
-      final converter = $BudgetsTable.$convertercategoryFksn;
-      map['category_fks'] = Variable<String>(converter.toSql(categoryFks));
+      map['category_fks'] = Variable<String>(
+          $BudgetsTable.$convertercategoryFksn.toSql(categoryFks));
     }
     if (!nullToAbsent || categoryFksExclude != null) {
-      final converter = $BudgetsTable.$convertercategoryFksExcluden;
-      map['category_fks_exclude'] =
-          Variable<String>(converter.toSql(categoryFksExclude));
+      map['category_fks_exclude'] = Variable<String>($BudgetsTable
+          .$convertercategoryFksExcluden
+          .toSql(categoryFksExclude));
     }
     map['income'] = Variable<bool>(income);
     map['archived'] = Variable<bool>(archived);
     map['added_transactions_only'] = Variable<bool>(addedTransactionsOnly);
     map['period_length'] = Variable<int>(periodLength);
     if (!nullToAbsent || reoccurrence != null) {
-      final converter = $BudgetsTable.$converterreoccurrencen;
-      map['reoccurrence'] = Variable<int>(converter.toSql(reoccurrence));
+      map['reoccurrence'] = Variable<int>(
+          $BudgetsTable.$converterreoccurrencen.toSql(reoccurrence));
     }
     map['date_created'] = Variable<DateTime>(dateCreated);
     if (!nullToAbsent || dateTimeModified != null) {
@@ -3983,34 +4071,33 @@ class Budget extends DataClass implements Insertable<Budget> {
     map['order'] = Variable<int>(order);
     map['wallet_fk'] = Variable<String>(walletFk);
     if (!nullToAbsent || budgetTransactionFilters != null) {
-      final converter = $BudgetsTable.$converterbudgetTransactionFiltersn;
-      map['budget_transaction_filters'] =
-          Variable<String>(converter.toSql(budgetTransactionFilters));
+      map['budget_transaction_filters'] = Variable<String>($BudgetsTable
+          .$converterbudgetTransactionFiltersn
+          .toSql(budgetTransactionFilters));
     }
     if (!nullToAbsent || memberTransactionFilters != null) {
-      final converter = $BudgetsTable.$convertermemberTransactionFiltersn;
-      map['member_transaction_filters'] =
-          Variable<String>(converter.toSql(memberTransactionFilters));
+      map['member_transaction_filters'] = Variable<String>($BudgetsTable
+          .$convertermemberTransactionFiltersn
+          .toSql(memberTransactionFilters));
     }
     if (!nullToAbsent || sharedKey != null) {
       map['shared_key'] = Variable<String>(sharedKey);
     }
     if (!nullToAbsent || sharedOwnerMember != null) {
-      final converter = $BudgetsTable.$convertersharedOwnerMembern;
-      map['shared_owner_member'] =
-          Variable<int>(converter.toSql(sharedOwnerMember));
+      map['shared_owner_member'] = Variable<int>(
+          $BudgetsTable.$convertersharedOwnerMembern.toSql(sharedOwnerMember));
     }
     if (!nullToAbsent || sharedDateUpdated != null) {
       map['shared_date_updated'] = Variable<DateTime>(sharedDateUpdated);
     }
     if (!nullToAbsent || sharedMembers != null) {
-      final converter = $BudgetsTable.$convertersharedMembersn;
-      map['shared_members'] = Variable<String>(converter.toSql(sharedMembers));
+      map['shared_members'] = Variable<String>(
+          $BudgetsTable.$convertersharedMembersn.toSql(sharedMembers));
     }
     if (!nullToAbsent || sharedAllMembersEver != null) {
-      final converter = $BudgetsTable.$convertersharedAllMembersEvern;
-      map['shared_all_members_ever'] =
-          Variable<String>(converter.toSql(sharedAllMembersEver));
+      map['shared_all_members_ever'] = Variable<String>($BudgetsTable
+          .$convertersharedAllMembersEvern
+          .toSql(sharedAllMembersEver));
     }
     map['is_absolute_spending_limit'] = Variable<bool>(isAbsoluteSpendingLimit);
     return map;
@@ -4234,6 +4321,64 @@ class Budget extends DataClass implements Insertable<Budget> {
         isAbsoluteSpendingLimit:
             isAbsoluteSpendingLimit ?? this.isAbsoluteSpendingLimit,
       );
+  Budget copyWithCompanion(BudgetsCompanion data) {
+    return Budget(
+      budgetPk: data.budgetPk.present ? data.budgetPk.value : this.budgetPk,
+      name: data.name.present ? data.name.value : this.name,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      colour: data.colour.present ? data.colour.value : this.colour,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      walletFks: data.walletFks.present ? data.walletFks.value : this.walletFks,
+      categoryFks:
+          data.categoryFks.present ? data.categoryFks.value : this.categoryFks,
+      categoryFksExclude: data.categoryFksExclude.present
+          ? data.categoryFksExclude.value
+          : this.categoryFksExclude,
+      income: data.income.present ? data.income.value : this.income,
+      archived: data.archived.present ? data.archived.value : this.archived,
+      addedTransactionsOnly: data.addedTransactionsOnly.present
+          ? data.addedTransactionsOnly.value
+          : this.addedTransactionsOnly,
+      periodLength: data.periodLength.present
+          ? data.periodLength.value
+          : this.periodLength,
+      reoccurrence: data.reoccurrence.present
+          ? data.reoccurrence.value
+          : this.reoccurrence,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      pinned: data.pinned.present ? data.pinned.value : this.pinned,
+      order: data.order.present ? data.order.value : this.order,
+      walletFk: data.walletFk.present ? data.walletFk.value : this.walletFk,
+      budgetTransactionFilters: data.budgetTransactionFilters.present
+          ? data.budgetTransactionFilters.value
+          : this.budgetTransactionFilters,
+      memberTransactionFilters: data.memberTransactionFilters.present
+          ? data.memberTransactionFilters.value
+          : this.memberTransactionFilters,
+      sharedKey: data.sharedKey.present ? data.sharedKey.value : this.sharedKey,
+      sharedOwnerMember: data.sharedOwnerMember.present
+          ? data.sharedOwnerMember.value
+          : this.sharedOwnerMember,
+      sharedDateUpdated: data.sharedDateUpdated.present
+          ? data.sharedDateUpdated.value
+          : this.sharedDateUpdated,
+      sharedMembers: data.sharedMembers.present
+          ? data.sharedMembers.value
+          : this.sharedMembers,
+      sharedAllMembersEver: data.sharedAllMembersEver.present
+          ? data.sharedAllMembersEver.value
+          : this.sharedAllMembersEver,
+      isAbsoluteSpendingLimit: data.isAbsoluteSpendingLimit.present
+          ? data.isAbsoluteSpendingLimit.value
+          : this.isAbsoluteSpendingLimit,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Budget(')
@@ -4580,21 +4725,17 @@ class BudgetsCompanion extends UpdateCompanion<Budget> {
       map['end_date'] = Variable<DateTime>(endDate.value);
     }
     if (walletFks.present) {
-      final converter = $BudgetsTable.$converterwalletFksn;
-
-      map['wallet_fks'] = Variable<String>(converter.toSql(walletFks.value));
+      map['wallet_fks'] = Variable<String>(
+          $BudgetsTable.$converterwalletFksn.toSql(walletFks.value));
     }
     if (categoryFks.present) {
-      final converter = $BudgetsTable.$convertercategoryFksn;
-
-      map['category_fks'] =
-          Variable<String>(converter.toSql(categoryFks.value));
+      map['category_fks'] = Variable<String>(
+          $BudgetsTable.$convertercategoryFksn.toSql(categoryFks.value));
     }
     if (categoryFksExclude.present) {
-      final converter = $BudgetsTable.$convertercategoryFksExcluden;
-
-      map['category_fks_exclude'] =
-          Variable<String>(converter.toSql(categoryFksExclude.value));
+      map['category_fks_exclude'] = Variable<String>($BudgetsTable
+          .$convertercategoryFksExcluden
+          .toSql(categoryFksExclude.value));
     }
     if (income.present) {
       map['income'] = Variable<bool>(income.value);
@@ -4610,9 +4751,8 @@ class BudgetsCompanion extends UpdateCompanion<Budget> {
       map['period_length'] = Variable<int>(periodLength.value);
     }
     if (reoccurrence.present) {
-      final converter = $BudgetsTable.$converterreoccurrencen;
-
-      map['reoccurrence'] = Variable<int>(converter.toSql(reoccurrence.value));
+      map['reoccurrence'] = Variable<int>(
+          $BudgetsTable.$converterreoccurrencen.toSql(reoccurrence.value));
     }
     if (dateCreated.present) {
       map['date_created'] = Variable<DateTime>(dateCreated.value);
@@ -4630,40 +4770,34 @@ class BudgetsCompanion extends UpdateCompanion<Budget> {
       map['wallet_fk'] = Variable<String>(walletFk.value);
     }
     if (budgetTransactionFilters.present) {
-      final converter = $BudgetsTable.$converterbudgetTransactionFiltersn;
-
-      map['budget_transaction_filters'] =
-          Variable<String>(converter.toSql(budgetTransactionFilters.value));
+      map['budget_transaction_filters'] = Variable<String>($BudgetsTable
+          .$converterbudgetTransactionFiltersn
+          .toSql(budgetTransactionFilters.value));
     }
     if (memberTransactionFilters.present) {
-      final converter = $BudgetsTable.$convertermemberTransactionFiltersn;
-
-      map['member_transaction_filters'] =
-          Variable<String>(converter.toSql(memberTransactionFilters.value));
+      map['member_transaction_filters'] = Variable<String>($BudgetsTable
+          .$convertermemberTransactionFiltersn
+          .toSql(memberTransactionFilters.value));
     }
     if (sharedKey.present) {
       map['shared_key'] = Variable<String>(sharedKey.value);
     }
     if (sharedOwnerMember.present) {
-      final converter = $BudgetsTable.$convertersharedOwnerMembern;
-
-      map['shared_owner_member'] =
-          Variable<int>(converter.toSql(sharedOwnerMember.value));
+      map['shared_owner_member'] = Variable<int>($BudgetsTable
+          .$convertersharedOwnerMembern
+          .toSql(sharedOwnerMember.value));
     }
     if (sharedDateUpdated.present) {
       map['shared_date_updated'] = Variable<DateTime>(sharedDateUpdated.value);
     }
     if (sharedMembers.present) {
-      final converter = $BudgetsTable.$convertersharedMembersn;
-
-      map['shared_members'] =
-          Variable<String>(converter.toSql(sharedMembers.value));
+      map['shared_members'] = Variable<String>(
+          $BudgetsTable.$convertersharedMembersn.toSql(sharedMembers.value));
     }
     if (sharedAllMembersEver.present) {
-      final converter = $BudgetsTable.$convertersharedAllMembersEvern;
-
-      map['shared_all_members_ever'] =
-          Variable<String>(converter.toSql(sharedAllMembersEver.value));
+      map['shared_all_members_ever'] = Variable<String>($BudgetsTable
+          .$convertersharedAllMembersEvern
+          .toSql(sharedAllMembersEver.value));
     }
     if (isAbsoluteSpendingLimit.present) {
       map['is_absolute_spending_limit'] =
@@ -4937,6 +5071,22 @@ class CategoryBudgetLimit extends DataClass
             : this.dateTimeModified,
         walletFk: walletFk ?? this.walletFk,
       );
+  CategoryBudgetLimit copyWithCompanion(CategoryBudgetLimitsCompanion data) {
+    return CategoryBudgetLimit(
+      categoryLimitPk: data.categoryLimitPk.present
+          ? data.categoryLimitPk.value
+          : this.categoryLimitPk,
+      categoryFk:
+          data.categoryFk.present ? data.categoryFk.value : this.categoryFk,
+      budgetFk: data.budgetFk.present ? data.budgetFk.value : this.budgetFk,
+      amount: data.amount.present ? data.amount.value : this.amount,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      walletFk: data.walletFk.present ? data.walletFk.value : this.walletFk,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('CategoryBudgetLimit(')
@@ -5327,6 +5477,26 @@ class TransactionAssociatedTitle extends DataClass
         order: order ?? this.order,
         isExactMatch: isExactMatch ?? this.isExactMatch,
       );
+  TransactionAssociatedTitle copyWithCompanion(AssociatedTitlesCompanion data) {
+    return TransactionAssociatedTitle(
+      associatedTitlePk: data.associatedTitlePk.present
+          ? data.associatedTitlePk.value
+          : this.associatedTitlePk,
+      categoryFk:
+          data.categoryFk.present ? data.categoryFk.value : this.categoryFk,
+      title: data.title.present ? data.title.value : this.title,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      order: data.order.present ? data.order.value : this.order,
+      isExactMatch: data.isExactMatch.present
+          ? data.isExactMatch.value
+          : this.isExactMatch,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TransactionAssociatedTitle(')
@@ -5615,6 +5785,18 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
         settingsJSON: settingsJSON ?? this.settingsJSON,
         dateUpdated: dateUpdated ?? this.dateUpdated,
       );
+  AppSetting copyWithCompanion(AppSettingsCompanion data) {
+    return AppSetting(
+      settingsPk:
+          data.settingsPk.present ? data.settingsPk.value : this.settingsPk,
+      settingsJSON: data.settingsJSON.present
+          ? data.settingsJSON.value
+          : this.settingsJSON,
+      dateUpdated:
+          data.dateUpdated.present ? data.dateUpdated.value : this.dateUpdated,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('AppSetting(')
@@ -6101,6 +6283,40 @@ class ScannerTemplate extends DataClass implements Insertable<ScannerTemplate> {
         walletFk: walletFk ?? this.walletFk,
         ignore: ignore ?? this.ignore,
       );
+  ScannerTemplate copyWithCompanion(ScannerTemplatesCompanion data) {
+    return ScannerTemplate(
+      scannerTemplatePk: data.scannerTemplatePk.present
+          ? data.scannerTemplatePk.value
+          : this.scannerTemplatePk,
+      dateCreated:
+          data.dateCreated.present ? data.dateCreated.value : this.dateCreated,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+      templateName: data.templateName.present
+          ? data.templateName.value
+          : this.templateName,
+      contains: data.contains.present ? data.contains.value : this.contains,
+      titleTransactionBefore: data.titleTransactionBefore.present
+          ? data.titleTransactionBefore.value
+          : this.titleTransactionBefore,
+      titleTransactionAfter: data.titleTransactionAfter.present
+          ? data.titleTransactionAfter.value
+          : this.titleTransactionAfter,
+      amountTransactionBefore: data.amountTransactionBefore.present
+          ? data.amountTransactionBefore.value
+          : this.amountTransactionBefore,
+      amountTransactionAfter: data.amountTransactionAfter.present
+          ? data.amountTransactionAfter.value
+          : this.amountTransactionAfter,
+      defaultCategoryFk: data.defaultCategoryFk.present
+          ? data.defaultCategoryFk.value
+          : this.defaultCategoryFk,
+      walletFk: data.walletFk.present ? data.walletFk.value : this.walletFk,
+      ignore: data.ignore.present ? data.ignore.value : this.ignore,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ScannerTemplate(')
@@ -6363,7 +6579,6 @@ class $DeleteLogsTable extends DeleteLogs
   late final GeneratedColumn<String> entryPk = GeneratedColumn<String>(
       'entry_pk', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumnWithTypeConverter<DeleteLogType, int> type =
       GeneratedColumn<int>('type', aliasedName, false,
@@ -6402,7 +6617,6 @@ class $DeleteLogsTable extends DeleteLogs
     } else if (isInserting) {
       context.missing(_entryPkMeta);
     }
-    context.handle(_typeMeta, const VerificationResult.success());
     if (data.containsKey('date_time_modified')) {
       context.handle(
           _dateTimeModifiedMeta,
@@ -6454,8 +6668,7 @@ class DeleteLog extends DataClass implements Insertable<DeleteLog> {
     map['delete_log_pk'] = Variable<String>(deleteLogPk);
     map['entry_pk'] = Variable<String>(entryPk);
     {
-      final converter = $DeleteLogsTable.$convertertype;
-      map['type'] = Variable<int>(converter.toSql(type));
+      map['type'] = Variable<int>($DeleteLogsTable.$convertertype.toSql(type));
     }
     map['date_time_modified'] = Variable<DateTime>(dateTimeModified);
     return map;
@@ -6504,6 +6717,18 @@ class DeleteLog extends DataClass implements Insertable<DeleteLog> {
         type: type ?? this.type,
         dateTimeModified: dateTimeModified ?? this.dateTimeModified,
       );
+  DeleteLog copyWithCompanion(DeleteLogsCompanion data) {
+    return DeleteLog(
+      deleteLogPk:
+          data.deleteLogPk.present ? data.deleteLogPk.value : this.deleteLogPk,
+      entryPk: data.entryPk.present ? data.entryPk.value : this.entryPk,
+      type: data.type.present ? data.type.value : this.type,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('DeleteLog(')
@@ -6589,9 +6814,8 @@ class DeleteLogsCompanion extends UpdateCompanion<DeleteLog> {
       map['entry_pk'] = Variable<String>(entryPk.value);
     }
     if (type.present) {
-      final converter = $DeleteLogsTable.$convertertype;
-
-      map['type'] = Variable<int>(converter.toSql(type.value));
+      map['type'] =
+          Variable<int>($DeleteLogsTable.$convertertype.toSql(type.value));
     }
     if (dateTimeModified.present) {
       map['date_time_modified'] = Variable<DateTime>(dateTimeModified.value);
