@@ -17,7 +17,6 @@ void probeOne() {
     print(s.toUpperCase());
     print(s.length);
   }
-  var unused = 1;
 }
 
 void probeTwo() {
