@@ -87,6 +87,23 @@ class $WalletsTable extends Wallets
           defaultValue: const Constant(null))
       .withConverter<List<HomePageWidgetDisplay>?>(
           $WalletsTable.$converterhomePageWidgetDisplayn);
+  static const VerificationMeta _accountLast4Meta =
+      const VerificationMeta('accountLast4');
+  @override
+  late final GeneratedColumn<String> accountLast4 = GeneratedColumn<String>(
+      'account_last4', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 4),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _closedMeta = const VerificationMeta('closed');
+  @override
+  late final GeneratedColumn<bool> closed = GeneratedColumn<bool>(
+      'closed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("closed" IN (0, 1))'),
+      defaultValue: const Constant(false));
   @override
   List<GeneratedColumn> get $columns => [
         walletPk,
@@ -99,7 +116,9 @@ class $WalletsTable extends Wallets
         currency,
         currencyFormat,
         decimals,
-        homePageWidgetDisplay
+        homePageWidgetDisplay,
+        accountLast4,
+        closed
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -161,6 +180,16 @@ class $WalletsTable extends Wallets
       context.handle(_decimalsMeta,
           decimals.isAcceptableOrUnknown(data['decimals']!, _decimalsMeta));
     }
+    if (data.containsKey('account_last4')) {
+      context.handle(
+          _accountLast4Meta,
+          accountLast4.isAcceptableOrUnknown(
+              data['account_last4']!, _accountLast4Meta));
+    }
+    if (data.containsKey('closed')) {
+      context.handle(_closedMeta,
+          closed.isAcceptableOrUnknown(data['closed']!, _closedMeta));
+    }
     return context;
   }
 
@@ -193,6 +222,10 @@ class $WalletsTable extends Wallets
       homePageWidgetDisplay: $WalletsTable.$converterhomePageWidgetDisplayn
           .fromSql(attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}home_page_widget_display'])),
+      accountLast4: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}account_last4']),
+      closed: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}closed'])!,
     );
   }
 
@@ -222,6 +255,8 @@ class TransactionWallet extends DataClass
   final String? currencyFormat;
   final int decimals;
   final List<HomePageWidgetDisplay>? homePageWidgetDisplay;
+  final String? accountLast4;
+  final bool closed;
   const TransactionWallet(
       {required this.walletPk,
       required this.name,
@@ -233,7 +268,9 @@ class TransactionWallet extends DataClass
       this.currency,
       this.currencyFormat,
       required this.decimals,
-      this.homePageWidgetDisplay});
+      this.homePageWidgetDisplay,
+      this.accountLast4,
+      required this.closed});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -262,6 +299,10 @@ class TransactionWallet extends DataClass
           .$converterhomePageWidgetDisplayn
           .toSql(homePageWidgetDisplay));
     }
+    if (!nullToAbsent || accountLast4 != null) {
+      map['account_last4'] = Variable<String>(accountLast4);
+    }
+    map['closed'] = Variable<bool>(closed);
     return map;
   }
 
@@ -289,6 +330,10 @@ class TransactionWallet extends DataClass
       homePageWidgetDisplay: homePageWidgetDisplay == null && nullToAbsent
           ? const Value.absent()
           : Value(homePageWidgetDisplay),
+      accountLast4: accountLast4 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountLast4),
+      closed: Value(closed),
     );
   }
 
@@ -309,6 +354,8 @@ class TransactionWallet extends DataClass
       decimals: serializer.fromJson<int>(json['decimals']),
       homePageWidgetDisplay: serializer.fromJson<List<HomePageWidgetDisplay>?>(
           json['homePageWidgetDisplay']),
+      accountLast4: serializer.fromJson<String?>(json['accountLast4']),
+      closed: serializer.fromJson<bool>(json['closed']),
     );
   }
   @override
@@ -327,6 +374,8 @@ class TransactionWallet extends DataClass
       'decimals': serializer.toJson<int>(decimals),
       'homePageWidgetDisplay': serializer
           .toJson<List<HomePageWidgetDisplay>?>(homePageWidgetDisplay),
+      'accountLast4': serializer.toJson<String?>(accountLast4),
+      'closed': serializer.toJson<bool>(closed),
     };
   }
 
@@ -342,7 +391,9 @@ class TransactionWallet extends DataClass
           Value<String?> currencyFormat = const Value.absent(),
           int? decimals,
           Value<List<HomePageWidgetDisplay>?> homePageWidgetDisplay =
-              const Value.absent()}) =>
+              const Value.absent(),
+          Value<String?> accountLast4 = const Value.absent(),
+          bool? closed}) =>
       TransactionWallet(
         walletPk: walletPk ?? this.walletPk,
         name: name ?? this.name,
@@ -360,6 +411,9 @@ class TransactionWallet extends DataClass
         homePageWidgetDisplay: homePageWidgetDisplay.present
             ? homePageWidgetDisplay.value
             : this.homePageWidgetDisplay,
+        accountLast4:
+            accountLast4.present ? accountLast4.value : this.accountLast4,
+        closed: closed ?? this.closed,
       );
   TransactionWallet copyWithCompanion(WalletsCompanion data) {
     return TransactionWallet(
@@ -381,6 +435,10 @@ class TransactionWallet extends DataClass
       homePageWidgetDisplay: data.homePageWidgetDisplay.present
           ? data.homePageWidgetDisplay.value
           : this.homePageWidgetDisplay,
+      accountLast4: data.accountLast4.present
+          ? data.accountLast4.value
+          : this.accountLast4,
+      closed: data.closed.present ? data.closed.value : this.closed,
     );
   }
 
@@ -397,7 +455,9 @@ class TransactionWallet extends DataClass
           ..write('currency: $currency, ')
           ..write('currencyFormat: $currencyFormat, ')
           ..write('decimals: $decimals, ')
-          ..write('homePageWidgetDisplay: $homePageWidgetDisplay')
+          ..write('homePageWidgetDisplay: $homePageWidgetDisplay, ')
+          ..write('accountLast4: $accountLast4, ')
+          ..write('closed: $closed')
           ..write(')'))
         .toString();
   }
@@ -414,7 +474,9 @@ class TransactionWallet extends DataClass
       currency,
       currencyFormat,
       decimals,
-      homePageWidgetDisplay);
+      homePageWidgetDisplay,
+      accountLast4,
+      closed);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -429,7 +491,9 @@ class TransactionWallet extends DataClass
           other.currency == this.currency &&
           other.currencyFormat == this.currencyFormat &&
           other.decimals == this.decimals &&
-          other.homePageWidgetDisplay == this.homePageWidgetDisplay);
+          other.homePageWidgetDisplay == this.homePageWidgetDisplay &&
+          other.accountLast4 == this.accountLast4 &&
+          other.closed == this.closed);
 }
 
 class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
@@ -444,6 +508,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
   final Value<String?> currencyFormat;
   final Value<int> decimals;
   final Value<List<HomePageWidgetDisplay>?> homePageWidgetDisplay;
+  final Value<String?> accountLast4;
+  final Value<bool> closed;
   final Value<int> rowid;
   const WalletsCompanion({
     this.walletPk = const Value.absent(),
@@ -457,6 +523,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
     this.currencyFormat = const Value.absent(),
     this.decimals = const Value.absent(),
     this.homePageWidgetDisplay = const Value.absent(),
+    this.accountLast4 = const Value.absent(),
+    this.closed = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   WalletsCompanion.insert({
@@ -471,6 +539,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
     this.currencyFormat = const Value.absent(),
     this.decimals = const Value.absent(),
     this.homePageWidgetDisplay = const Value.absent(),
+    this.accountLast4 = const Value.absent(),
+    this.closed = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : name = Value(name),
         order = Value(order);
@@ -486,6 +556,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
     Expression<String>? currencyFormat,
     Expression<int>? decimals,
     Expression<String>? homePageWidgetDisplay,
+    Expression<String>? accountLast4,
+    Expression<bool>? closed,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -501,6 +573,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
       if (decimals != null) 'decimals': decimals,
       if (homePageWidgetDisplay != null)
         'home_page_widget_display': homePageWidgetDisplay,
+      if (accountLast4 != null) 'account_last4': accountLast4,
+      if (closed != null) 'closed': closed,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -517,6 +591,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
       Value<String?>? currencyFormat,
       Value<int>? decimals,
       Value<List<HomePageWidgetDisplay>?>? homePageWidgetDisplay,
+      Value<String?>? accountLast4,
+      Value<bool>? closed,
       Value<int>? rowid}) {
     return WalletsCompanion(
       walletPk: walletPk ?? this.walletPk,
@@ -531,6 +607,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
       decimals: decimals ?? this.decimals,
       homePageWidgetDisplay:
           homePageWidgetDisplay ?? this.homePageWidgetDisplay,
+      accountLast4: accountLast4 ?? this.accountLast4,
+      closed: closed ?? this.closed,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -573,6 +651,12 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
           .$converterhomePageWidgetDisplayn
           .toSql(homePageWidgetDisplay.value));
     }
+    if (accountLast4.present) {
+      map['account_last4'] = Variable<String>(accountLast4.value);
+    }
+    if (closed.present) {
+      map['closed'] = Variable<bool>(closed.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -593,6 +677,8 @@ class WalletsCompanion extends UpdateCompanion<TransactionWallet> {
           ..write('currencyFormat: $currencyFormat, ')
           ..write('decimals: $decimals, ')
           ..write('homePageWidgetDisplay: $homePageWidgetDisplay, ')
+          ..write('accountLast4: $accountLast4, ')
+          ..write('closed: $closed, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2177,6 +2263,29 @@ class $TransactionsTable extends Transactions
           .withConverter<List<String>?>(
               $TransactionsTable.$converterbudgetFksExcluden);
   @override
+  late final GeneratedColumnWithTypeConverter<Book?, int> book =
+      GeneratedColumn<int>('book', aliasedName, true,
+              type: DriftSqlType.int, requiredDuringInsert: false)
+          .withConverter<Book?>($TransactionsTable.$converterbookn);
+  static const VerificationMeta _hstRateMeta =
+      const VerificationMeta('hstRate');
+  @override
+  late final GeneratedColumn<double> hstRate = GeneratedColumn<double>(
+      'hst_rate', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _hstAmountMeta =
+      const VerificationMeta('hstAmount');
+  @override
+  late final GeneratedColumn<double> hstAmount = GeneratedColumn<double>(
+      'hst_amount', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _cadValueMeta =
+      const VerificationMeta('cadValue');
+  @override
+  late final GeneratedColumn<double> cadValue = GeneratedColumn<double>(
+      'cad_value', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  @override
   List<GeneratedColumn> get $columns => [
         transactionPk,
         pairedTransactionFk,
@@ -2208,7 +2317,11 @@ class $TransactionsTable extends Transactions
         sharedReferenceBudgetPk,
         objectiveFk,
         objectiveLoanFk,
-        budgetFksExclude
+        budgetFksExclude,
+        book,
+        hstRate,
+        hstAmount,
+        cadValue
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -2370,6 +2483,18 @@ class $TransactionsTable extends Transactions
           objectiveLoanFk.isAcceptableOrUnknown(
               data['objective_loan_fk']!, _objectiveLoanFkMeta));
     }
+    if (data.containsKey('hst_rate')) {
+      context.handle(_hstRateMeta,
+          hstRate.isAcceptableOrUnknown(data['hst_rate']!, _hstRateMeta));
+    }
+    if (data.containsKey('hst_amount')) {
+      context.handle(_hstAmountMeta,
+          hstAmount.isAcceptableOrUnknown(data['hst_amount']!, _hstAmountMeta));
+    }
+    if (data.containsKey('cad_value')) {
+      context.handle(_cadValueMeta,
+          cadValue.isAcceptableOrUnknown(data['cad_value']!, _cadValueMeta));
+    }
     return context;
   }
 
@@ -2451,6 +2576,15 @@ class $TransactionsTable extends Transactions
       budgetFksExclude: $TransactionsTable.$converterbudgetFksExcluden.fromSql(
           attachedDatabase.typeMapping.read(DriftSqlType.string,
               data['${effectivePrefix}budget_fks_exclude'])),
+      book: $TransactionsTable.$converterbookn.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}book'])),
+      hstRate: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}hst_rate']),
+      hstAmount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}hst_amount']),
+      cadValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}cad_value']),
     );
   }
 
@@ -2482,6 +2616,10 @@ class $TransactionsTable extends Transactions
       const StringListInColumnConverter();
   static TypeConverter<List<String>?, String?> $converterbudgetFksExcluden =
       NullAwareTypeConverter.wrap($converterbudgetFksExclude);
+  static JsonTypeConverter2<Book, int, int> $converterbook =
+      const EnumIndexConverter<Book>(Book.values);
+  static JsonTypeConverter2<Book?, int?, int?> $converterbookn =
+      JsonTypeConverter2.asNullable($converterbook);
 }
 
 class Transaction extends DataClass implements Insertable<Transaction> {
@@ -2516,6 +2654,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String? objectiveFk;
   final String? objectiveLoanFk;
   final List<String>? budgetFksExclude;
+  final Book? book;
+  final double? hstRate;
+  final double? hstAmount;
+  final double? cadValue;
   const Transaction(
       {required this.transactionPk,
       this.pairedTransactionFk,
@@ -2547,7 +2689,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       this.sharedReferenceBudgetPk,
       this.objectiveFk,
       this.objectiveLoanFk,
-      this.budgetFksExclude});
+      this.budgetFksExclude,
+      this.book,
+      this.hstRate,
+      this.hstAmount,
+      this.cadValue});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2634,6 +2780,19 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .$converterbudgetFksExcluden
           .toSql(budgetFksExclude));
     }
+    if (!nullToAbsent || book != null) {
+      map['book'] =
+          Variable<int>($TransactionsTable.$converterbookn.toSql(book));
+    }
+    if (!nullToAbsent || hstRate != null) {
+      map['hst_rate'] = Variable<double>(hstRate);
+    }
+    if (!nullToAbsent || hstAmount != null) {
+      map['hst_amount'] = Variable<double>(hstAmount);
+    }
+    if (!nullToAbsent || cadValue != null) {
+      map['cad_value'] = Variable<double>(cadValue);
+    }
     return map;
   }
 
@@ -2713,6 +2872,16 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       budgetFksExclude: budgetFksExclude == null && nullToAbsent
           ? const Value.absent()
           : Value(budgetFksExclude),
+      book: book == null && nullToAbsent ? const Value.absent() : Value(book),
+      hstRate: hstRate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hstRate),
+      hstAmount: hstAmount == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hstAmount),
+      cadValue: cadValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cadValue),
     );
   }
 
@@ -2764,6 +2933,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       objectiveLoanFk: serializer.fromJson<String?>(json['objectiveLoanFk']),
       budgetFksExclude:
           serializer.fromJson<List<String>?>(json['budgetFksExclude']),
+      book: $TransactionsTable.$converterbookn
+          .fromJson(serializer.fromJson<int?>(json['book'])),
+      hstRate: serializer.fromJson<double?>(json['hstRate']),
+      hstAmount: serializer.fromJson<double?>(json['hstAmount']),
+      cadValue: serializer.fromJson<double?>(json['cadValue']),
     );
   }
   @override
@@ -2810,6 +2984,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'objectiveFk': serializer.toJson<String?>(objectiveFk),
       'objectiveLoanFk': serializer.toJson<String?>(objectiveLoanFk),
       'budgetFksExclude': serializer.toJson<List<String>?>(budgetFksExclude),
+      'book': serializer
+          .toJson<int?>($TransactionsTable.$converterbookn.toJson(book)),
+      'hstRate': serializer.toJson<double?>(hstRate),
+      'hstAmount': serializer.toJson<double?>(hstAmount),
+      'cadValue': serializer.toJson<double?>(cadValue),
     };
   }
 
@@ -2844,7 +3023,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           Value<String?> sharedReferenceBudgetPk = const Value.absent(),
           Value<String?> objectiveFk = const Value.absent(),
           Value<String?> objectiveLoanFk = const Value.absent(),
-          Value<List<String>?> budgetFksExclude = const Value.absent()}) =>
+          Value<List<String>?> budgetFksExclude = const Value.absent(),
+          Value<Book?> book = const Value.absent(),
+          Value<double?> hstRate = const Value.absent(),
+          Value<double?> hstAmount = const Value.absent(),
+          Value<double?> cadValue = const Value.absent()}) =>
       Transaction(
         transactionPk: transactionPk ?? this.transactionPk,
         pairedTransactionFk: pairedTransactionFk.present
@@ -2904,6 +3087,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         budgetFksExclude: budgetFksExclude.present
             ? budgetFksExclude.value
             : this.budgetFksExclude,
+        book: book.present ? book.value : this.book,
+        hstRate: hstRate.present ? hstRate.value : this.hstRate,
+        hstAmount: hstAmount.present ? hstAmount.value : this.hstAmount,
+        cadValue: cadValue.present ? cadValue.value : this.cadValue,
       );
   Transaction copyWithCompanion(TransactionsCompanion data) {
     return Transaction(
@@ -2978,6 +3165,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       budgetFksExclude: data.budgetFksExclude.present
           ? data.budgetFksExclude.value
           : this.budgetFksExclude,
+      book: data.book.present ? data.book.value : this.book,
+      hstRate: data.hstRate.present ? data.hstRate.value : this.hstRate,
+      hstAmount: data.hstAmount.present ? data.hstAmount.value : this.hstAmount,
+      cadValue: data.cadValue.present ? data.cadValue.value : this.cadValue,
     );
   }
 
@@ -3017,7 +3208,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('sharedReferenceBudgetPk: $sharedReferenceBudgetPk, ')
           ..write('objectiveFk: $objectiveFk, ')
           ..write('objectiveLoanFk: $objectiveLoanFk, ')
-          ..write('budgetFksExclude: $budgetFksExclude')
+          ..write('budgetFksExclude: $budgetFksExclude, ')
+          ..write('book: $book, ')
+          ..write('hstRate: $hstRate, ')
+          ..write('hstAmount: $hstAmount, ')
+          ..write('cadValue: $cadValue')
           ..write(')'))
         .toString();
   }
@@ -3054,7 +3249,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         sharedReferenceBudgetPk,
         objectiveFk,
         objectiveLoanFk,
-        budgetFksExclude
+        budgetFksExclude,
+        book,
+        hstRate,
+        hstAmount,
+        cadValue
       ]);
   @override
   bool operator ==(Object other) =>
@@ -3093,7 +3292,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.sharedReferenceBudgetPk == this.sharedReferenceBudgetPk &&
           other.objectiveFk == this.objectiveFk &&
           other.objectiveLoanFk == this.objectiveLoanFk &&
-          other.budgetFksExclude == this.budgetFksExclude);
+          other.budgetFksExclude == this.budgetFksExclude &&
+          other.book == this.book &&
+          other.hstRate == this.hstRate &&
+          other.hstAmount == this.hstAmount &&
+          other.cadValue == this.cadValue);
 }
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
@@ -3128,6 +3331,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String?> objectiveFk;
   final Value<String?> objectiveLoanFk;
   final Value<List<String>?> budgetFksExclude;
+  final Value<Book?> book;
+  final Value<double?> hstRate;
+  final Value<double?> hstAmount;
+  final Value<double?> cadValue;
   final Value<int> rowid;
   const TransactionsCompanion({
     this.transactionPk = const Value.absent(),
@@ -3161,6 +3368,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.objectiveFk = const Value.absent(),
     this.objectiveLoanFk = const Value.absent(),
     this.budgetFksExclude = const Value.absent(),
+    this.book = const Value.absent(),
+    this.hstRate = const Value.absent(),
+    this.hstAmount = const Value.absent(),
+    this.cadValue = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -3195,6 +3406,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.objectiveFk = const Value.absent(),
     this.objectiveLoanFk = const Value.absent(),
     this.budgetFksExclude = const Value.absent(),
+    this.book = const Value.absent(),
+    this.hstRate = const Value.absent(),
+    this.hstAmount = const Value.absent(),
+    this.cadValue = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : name = Value(name),
         amount = Value(amount),
@@ -3232,6 +3447,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String>? objectiveFk,
     Expression<String>? objectiveLoanFk,
     Expression<String>? budgetFksExclude,
+    Expression<int>? book,
+    Expression<double>? hstRate,
+    Expression<double>? hstAmount,
+    Expression<double>? cadValue,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3272,6 +3491,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (objectiveFk != null) 'objective_fk': objectiveFk,
       if (objectiveLoanFk != null) 'objective_loan_fk': objectiveLoanFk,
       if (budgetFksExclude != null) 'budget_fks_exclude': budgetFksExclude,
+      if (book != null) 'book': book,
+      if (hstRate != null) 'hst_rate': hstRate,
+      if (hstAmount != null) 'hst_amount': hstAmount,
+      if (cadValue != null) 'cad_value': cadValue,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3308,6 +3531,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<String?>? objectiveFk,
       Value<String?>? objectiveLoanFk,
       Value<List<String>?>? budgetFksExclude,
+      Value<Book?>? book,
+      Value<double?>? hstRate,
+      Value<double?>? hstAmount,
+      Value<double?>? cadValue,
       Value<int>? rowid}) {
     return TransactionsCompanion(
       transactionPk: transactionPk ?? this.transactionPk,
@@ -3346,6 +3573,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       objectiveFk: objectiveFk ?? this.objectiveFk,
       objectiveLoanFk: objectiveLoanFk ?? this.objectiveLoanFk,
       budgetFksExclude: budgetFksExclude ?? this.budgetFksExclude,
+      book: book ?? this.book,
+      hstRate: hstRate ?? this.hstRate,
+      hstAmount: hstAmount ?? this.hstAmount,
+      cadValue: cadValue ?? this.cadValue,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3458,6 +3689,19 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           .$converterbudgetFksExcluden
           .toSql(budgetFksExclude.value));
     }
+    if (book.present) {
+      map['book'] =
+          Variable<int>($TransactionsTable.$converterbookn.toSql(book.value));
+    }
+    if (hstRate.present) {
+      map['hst_rate'] = Variable<double>(hstRate.value);
+    }
+    if (hstAmount.present) {
+      map['hst_amount'] = Variable<double>(hstAmount.value);
+    }
+    if (cadValue.present) {
+      map['cad_value'] = Variable<double>(cadValue.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3501,6 +3745,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
           ..write('objectiveFk: $objectiveFk, ')
           ..write('objectiveLoanFk: $objectiveLoanFk, ')
           ..write('budgetFksExclude: $budgetFksExclude, ')
+          ..write('book: $book, ')
+          ..write('hstRate: $hstRate, ')
+          ..write('hstAmount: $hstAmount, ')
+          ..write('cadValue: $cadValue, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -6839,6 +7087,370 @@ class DeleteLogsCompanion extends UpdateCompanion<DeleteLog> {
   }
 }
 
+class $HstFilingsTable extends HstFilings
+    with TableInfo<$HstFilingsTable, HstFiling> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HstFilingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _hstFilingPkMeta =
+      const VerificationMeta('hstFilingPk');
+  @override
+  late final GeneratedColumn<String> hstFilingPk = GeneratedColumn<String>(
+      'hst_filing_pk', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => uuid.v4());
+  static const VerificationMeta _periodStartMeta =
+      const VerificationMeta('periodStart');
+  @override
+  late final GeneratedColumn<DateTime> periodStart = GeneratedColumn<DateTime>(
+      'period_start', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _periodEndMeta =
+      const VerificationMeta('periodEnd');
+  @override
+  late final GeneratedColumn<DateTime> periodEnd = GeneratedColumn<DateTime>(
+      'period_end', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _filedDateMeta =
+      const VerificationMeta('filedDate');
+  @override
+  late final GeneratedColumn<DateTime> filedDate = GeneratedColumn<DateTime>(
+      'filed_date', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+      'note', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _dateTimeModifiedMeta =
+      const VerificationMeta('dateTimeModified');
+  @override
+  late final GeneratedColumn<DateTime> dateTimeModified =
+      GeneratedColumn<DateTime>('date_time_modified', aliasedName, true,
+          type: DriftSqlType.dateTime,
+          requiredDuringInsert: false,
+          defaultValue: Constant(DateTime.now()));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [hstFilingPk, periodStart, periodEnd, filedDate, note, dateTimeModified];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'hst_filings';
+  @override
+  VerificationContext validateIntegrity(Insertable<HstFiling> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('hst_filing_pk')) {
+      context.handle(
+          _hstFilingPkMeta,
+          hstFilingPk.isAcceptableOrUnknown(
+              data['hst_filing_pk']!, _hstFilingPkMeta));
+    }
+    if (data.containsKey('period_start')) {
+      context.handle(
+          _periodStartMeta,
+          periodStart.isAcceptableOrUnknown(
+              data['period_start']!, _periodStartMeta));
+    } else if (isInserting) {
+      context.missing(_periodStartMeta);
+    }
+    if (data.containsKey('period_end')) {
+      context.handle(_periodEndMeta,
+          periodEnd.isAcceptableOrUnknown(data['period_end']!, _periodEndMeta));
+    } else if (isInserting) {
+      context.missing(_periodEndMeta);
+    }
+    if (data.containsKey('filed_date')) {
+      context.handle(_filedDateMeta,
+          filedDate.isAcceptableOrUnknown(data['filed_date']!, _filedDateMeta));
+    } else if (isInserting) {
+      context.missing(_filedDateMeta);
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
+    if (data.containsKey('date_time_modified')) {
+      context.handle(
+          _dateTimeModifiedMeta,
+          dateTimeModified.isAcceptableOrUnknown(
+              data['date_time_modified']!, _dateTimeModifiedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {hstFilingPk};
+  @override
+  HstFiling map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HstFiling(
+      hstFilingPk: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}hst_filing_pk'])!,
+      periodStart: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}period_start'])!,
+      periodEnd: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}period_end'])!,
+      filedDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}filed_date'])!,
+      note: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      dateTimeModified: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}date_time_modified']),
+    );
+  }
+
+  @override
+  $HstFilingsTable createAlias(String alias) {
+    return $HstFilingsTable(attachedDatabase, alias);
+  }
+}
+
+class HstFiling extends DataClass implements Insertable<HstFiling> {
+  final String hstFilingPk;
+  final DateTime periodStart;
+  final DateTime periodEnd;
+  final DateTime filedDate;
+  final String? note;
+  final DateTime? dateTimeModified;
+  const HstFiling(
+      {required this.hstFilingPk,
+      required this.periodStart,
+      required this.periodEnd,
+      required this.filedDate,
+      this.note,
+      this.dateTimeModified});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['hst_filing_pk'] = Variable<String>(hstFilingPk);
+    map['period_start'] = Variable<DateTime>(periodStart);
+    map['period_end'] = Variable<DateTime>(periodEnd);
+    map['filed_date'] = Variable<DateTime>(filedDate);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || dateTimeModified != null) {
+      map['date_time_modified'] = Variable<DateTime>(dateTimeModified);
+    }
+    return map;
+  }
+
+  HstFilingsCompanion toCompanion(bool nullToAbsent) {
+    return HstFilingsCompanion(
+      hstFilingPk: Value(hstFilingPk),
+      periodStart: Value(periodStart),
+      periodEnd: Value(periodEnd),
+      filedDate: Value(filedDate),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      dateTimeModified: dateTimeModified == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateTimeModified),
+    );
+  }
+
+  factory HstFiling.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HstFiling(
+      hstFilingPk: serializer.fromJson<String>(json['hstFilingPk']),
+      periodStart: serializer.fromJson<DateTime>(json['periodStart']),
+      periodEnd: serializer.fromJson<DateTime>(json['periodEnd']),
+      filedDate: serializer.fromJson<DateTime>(json['filedDate']),
+      note: serializer.fromJson<String?>(json['note']),
+      dateTimeModified:
+          serializer.fromJson<DateTime?>(json['dateTimeModified']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'hstFilingPk': serializer.toJson<String>(hstFilingPk),
+      'periodStart': serializer.toJson<DateTime>(periodStart),
+      'periodEnd': serializer.toJson<DateTime>(periodEnd),
+      'filedDate': serializer.toJson<DateTime>(filedDate),
+      'note': serializer.toJson<String?>(note),
+      'dateTimeModified': serializer.toJson<DateTime?>(dateTimeModified),
+    };
+  }
+
+  HstFiling copyWith(
+          {String? hstFilingPk,
+          DateTime? periodStart,
+          DateTime? periodEnd,
+          DateTime? filedDate,
+          Value<String?> note = const Value.absent(),
+          Value<DateTime?> dateTimeModified = const Value.absent()}) =>
+      HstFiling(
+        hstFilingPk: hstFilingPk ?? this.hstFilingPk,
+        periodStart: periodStart ?? this.periodStart,
+        periodEnd: periodEnd ?? this.periodEnd,
+        filedDate: filedDate ?? this.filedDate,
+        note: note.present ? note.value : this.note,
+        dateTimeModified: dateTimeModified.present
+            ? dateTimeModified.value
+            : this.dateTimeModified,
+      );
+  HstFiling copyWithCompanion(HstFilingsCompanion data) {
+    return HstFiling(
+      hstFilingPk:
+          data.hstFilingPk.present ? data.hstFilingPk.value : this.hstFilingPk,
+      periodStart:
+          data.periodStart.present ? data.periodStart.value : this.periodStart,
+      periodEnd: data.periodEnd.present ? data.periodEnd.value : this.periodEnd,
+      filedDate: data.filedDate.present ? data.filedDate.value : this.filedDate,
+      note: data.note.present ? data.note.value : this.note,
+      dateTimeModified: data.dateTimeModified.present
+          ? data.dateTimeModified.value
+          : this.dateTimeModified,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HstFiling(')
+          ..write('hstFilingPk: $hstFilingPk, ')
+          ..write('periodStart: $periodStart, ')
+          ..write('periodEnd: $periodEnd, ')
+          ..write('filedDate: $filedDate, ')
+          ..write('note: $note, ')
+          ..write('dateTimeModified: $dateTimeModified')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      hstFilingPk, periodStart, periodEnd, filedDate, note, dateTimeModified);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HstFiling &&
+          other.hstFilingPk == this.hstFilingPk &&
+          other.periodStart == this.periodStart &&
+          other.periodEnd == this.periodEnd &&
+          other.filedDate == this.filedDate &&
+          other.note == this.note &&
+          other.dateTimeModified == this.dateTimeModified);
+}
+
+class HstFilingsCompanion extends UpdateCompanion<HstFiling> {
+  final Value<String> hstFilingPk;
+  final Value<DateTime> periodStart;
+  final Value<DateTime> periodEnd;
+  final Value<DateTime> filedDate;
+  final Value<String?> note;
+  final Value<DateTime?> dateTimeModified;
+  final Value<int> rowid;
+  const HstFilingsCompanion({
+    this.hstFilingPk = const Value.absent(),
+    this.periodStart = const Value.absent(),
+    this.periodEnd = const Value.absent(),
+    this.filedDate = const Value.absent(),
+    this.note = const Value.absent(),
+    this.dateTimeModified = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HstFilingsCompanion.insert({
+    this.hstFilingPk = const Value.absent(),
+    required DateTime periodStart,
+    required DateTime periodEnd,
+    required DateTime filedDate,
+    this.note = const Value.absent(),
+    this.dateTimeModified = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : periodStart = Value(periodStart),
+        periodEnd = Value(periodEnd),
+        filedDate = Value(filedDate);
+  static Insertable<HstFiling> custom({
+    Expression<String>? hstFilingPk,
+    Expression<DateTime>? periodStart,
+    Expression<DateTime>? periodEnd,
+    Expression<DateTime>? filedDate,
+    Expression<String>? note,
+    Expression<DateTime>? dateTimeModified,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (hstFilingPk != null) 'hst_filing_pk': hstFilingPk,
+      if (periodStart != null) 'period_start': periodStart,
+      if (periodEnd != null) 'period_end': periodEnd,
+      if (filedDate != null) 'filed_date': filedDate,
+      if (note != null) 'note': note,
+      if (dateTimeModified != null) 'date_time_modified': dateTimeModified,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HstFilingsCompanion copyWith(
+      {Value<String>? hstFilingPk,
+      Value<DateTime>? periodStart,
+      Value<DateTime>? periodEnd,
+      Value<DateTime>? filedDate,
+      Value<String?>? note,
+      Value<DateTime?>? dateTimeModified,
+      Value<int>? rowid}) {
+    return HstFilingsCompanion(
+      hstFilingPk: hstFilingPk ?? this.hstFilingPk,
+      periodStart: periodStart ?? this.periodStart,
+      periodEnd: periodEnd ?? this.periodEnd,
+      filedDate: filedDate ?? this.filedDate,
+      note: note ?? this.note,
+      dateTimeModified: dateTimeModified ?? this.dateTimeModified,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (hstFilingPk.present) {
+      map['hst_filing_pk'] = Variable<String>(hstFilingPk.value);
+    }
+    if (periodStart.present) {
+      map['period_start'] = Variable<DateTime>(periodStart.value);
+    }
+    if (periodEnd.present) {
+      map['period_end'] = Variable<DateTime>(periodEnd.value);
+    }
+    if (filedDate.present) {
+      map['filed_date'] = Variable<DateTime>(filedDate.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (dateTimeModified.present) {
+      map['date_time_modified'] = Variable<DateTime>(dateTimeModified.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HstFilingsCompanion(')
+          ..write('hstFilingPk: $hstFilingPk, ')
+          ..write('periodStart: $periodStart, ')
+          ..write('periodEnd: $periodEnd, ')
+          ..write('filedDate: $filedDate, ')
+          ..write('note: $note, ')
+          ..write('dateTimeModified: $dateTimeModified, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$FinanceDatabase extends GeneratedDatabase {
   _$FinanceDatabase(QueryExecutor e) : super(e);
   late final $WalletsTable wallets = $WalletsTable(this);
@@ -6854,6 +7466,7 @@ abstract class _$FinanceDatabase extends GeneratedDatabase {
   late final $ScannerTemplatesTable scannerTemplates =
       $ScannerTemplatesTable(this);
   late final $DeleteLogsTable deleteLogs = $DeleteLogsTable(this);
+  late final $HstFilingsTable hstFilings = $HstFilingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6868,6 +7481,7 @@ abstract class _$FinanceDatabase extends GeneratedDatabase {
         associatedTitles,
         appSettings,
         scannerTemplates,
-        deleteLogs
+        deleteLogs,
+        hstFilings
       ];
 }

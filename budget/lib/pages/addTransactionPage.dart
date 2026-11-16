@@ -701,6 +701,11 @@ class _AddTransactionPageState extends State<AddTransactionPage>
       objectiveLoanFk: selectedObjectiveLoanPk,
       budgetFksExclude:
           selectedExcludedBudgetPks.isEmpty ? null : selectedExcludedBudgetPks,
+      // Not edited on this page yet: keep the stored values.
+      book: widget.transaction?.book,
+      hstRate: widget.transaction?.hstRate,
+      hstAmount: widget.transaction?.hstAmount,
+      cadValue: widget.transaction?.cadValue,
     );
 
     return createdTransaction;
