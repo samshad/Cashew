@@ -26,7 +26,7 @@ import 'package:budget/pages/activityPage.dart';
 import 'package:flutter/material.dart' show RangeValues;
 part 'tables.g.dart';
 
-int schemaVersionGlobal = 46;
+int schemaVersionGlobal = 47;
 
 // To update and migrate the database, check the README
 
@@ -53,6 +53,9 @@ enum ObjectiveType {
   goal,
   loan, //income==true ? lent (loan) : borrowed
 }
+
+// Which book a transaction belongs to. Null = not assigned (data from before v47).
+enum Book { business, home }
 
 enum SharedOwnerMember {
   owner,
@@ -221,6 +224,7 @@ enum DeleteLogType {
   ScannerTemplate,
   Objective,
   Unused, // Was for the scanner template, but is now unused
+  HstFiling,
 }
 
 enum UpdateLogType {
@@ -233,6 +237,7 @@ enum UpdateLogType {
   ScannerTemplate,
   Objective,
   Unused, // Was for the scanner template, but is now unused
+  HstFiling,
 }
 
 @DataClassName('DeleteLog')
@@ -265,6 +270,8 @@ class Wallets extends Table {
       .nullable()
       .withDefault(const Constant(null))
       .map(const HomePageWidgetDisplayListInColumnConverter())();
+  TextColumn get accountLast4 => text().withLength(max: 4).nullable()();
+  BoolColumn get closed => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {walletPk};
@@ -334,6 +341,13 @@ class Transactions extends Table {
       text().references(Objectives, #objectivePk).nullable()();
   TextColumn get budgetFksExclude =>
       text().map(const StringListInColumnConverter()).nullable()();
+  IntColumn get book => intEnum<Book>().nullable()();
+  // Null = no HST. Otherwise the rate (%) used, kept as a snapshot.
+  RealColumn get hstRate => real().nullable()();
+  // HST included in amount. Attribute only: never added to or subtracted from amount.
+  RealColumn get hstAmount => real().nullable()();
+  // Optional CAD value for non-CAD entries.
+  RealColumn get cadValue => real().nullable()();
 
   @override
   Set<Column> get primaryKey => {transactionPk};
@@ -538,6 +552,21 @@ class Objectives extends Table {
   Set<Column> get primaryKey => {objectivePk};
 }
 
+// A period marked as filed with CRA.
+@DataClassName('HstFiling')
+class HstFilings extends Table {
+  TextColumn get hstFilingPk => text().clientDefault(() => uuid.v4())();
+  DateTimeColumn get periodStart => dateTime()();
+  DateTimeColumn get periodEnd => dateTime()();
+  DateTimeColumn get filedDate => dateTime()();
+  TextColumn get note => text().withLength(max: NOTE_LIMIT).nullable()();
+  DateTimeColumn get dateTimeModified =>
+      dateTime().withDefault(Constant(DateTime.now())).nullable()();
+
+  @override
+  Set<Column> get primaryKey => {hstFilingPk};
+}
+
 class TransactionWithCategory {
   final TransactionCategory category;
   final Transaction transaction;
@@ -688,6 +717,7 @@ class CategoryWithTotal {
   ScannerTemplates,
   DeleteLogs,
   Objectives,
+  HstFilings,
 ])
 class FinanceDatabase extends _$FinanceDatabase {
   // FinanceDatabase() : super(_openConnection());
@@ -1162,6 +1192,59 @@ class FinanceDatabase extends _$FinanceDatabase {
                 print(
                     "Migration Error: Error creating column objectives.type " +
                         e.toString());
+              }
+            },
+            from46To47: (m, schema) async {
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.book);
+              } catch (e) {
+                print(
+                    "Migration Error: Error creating column transactions.book " +
+                        e.toString());
+              }
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.hstRate);
+              } catch (e) {
+                print(
+                    "Migration Error: Error creating column transactions.hstRate " +
+                        e.toString());
+              }
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.hstAmount);
+              } catch (e) {
+                print(
+                    "Migration Error: Error creating column transactions.hstAmount " +
+                        e.toString());
+              }
+              try {
+                await m.addColumn(
+                    schema.transactions, schema.transactions.cadValue);
+              } catch (e) {
+                print(
+                    "Migration Error: Error creating column transactions.cadValue " +
+                        e.toString());
+              }
+              try {
+                await m.addColumn(schema.wallets, schema.wallets.accountLast4);
+              } catch (e) {
+                print(
+                    "Migration Error: Error creating column wallets.accountLast4 " +
+                        e.toString());
+              }
+              try {
+                await m.addColumn(schema.wallets, schema.wallets.closed);
+              } catch (e) {
+                print("Migration Error: Error creating column wallets.closed " +
+                    e.toString());
+              }
+              try {
+                await m.createTable(schema.hstFilings);
+              } catch (e) {
+                print("Migration Error: Error creating table hstFilings " +
+                    e.toString());
               }
             },
           ),
@@ -2575,6 +2658,14 @@ class FinanceDatabase extends _$FinanceDatabase {
         .get();
   }
 
+  Future<List<HstFiling>> getAllNewHstFilings(DateTime lastSynced) {
+    return (select(hstFilings)
+          ..where((tbl) =>
+              tbl.dateTimeModified.isBiggerOrEqualValue(lastSynced) |
+              tbl.dateTimeModified.isNull()))
+        .get();
+  }
+
   Future<List<ScannerTemplate>> getAllNewScannerTemplates(DateTime lastSynced) {
     return (select(scannerTemplates)
           ..where((tbl) =>
@@ -3697,6 +3788,15 @@ class FinanceDatabase extends _$FinanceDatabase {
                   syncLog.transactionDateTime ?? DateTime.now(),
                 ),
           );
+        } else if (syncLog.deleteLogType == DeleteLogType.HstFiling) {
+          batch.deleteWhere(
+            hstFilings,
+            (tbl) =>
+                tbl.hstFilingPk.equals(syncLog.pk) &
+                tbl.dateTimeModified.isSmallerThanValue(
+                  syncLog.transactionDateTime ?? DateTime.now(),
+                ),
+          );
         } else if (syncLog.updateLogType == UpdateLogType.TransactionWallet) {
           batch.update(
             wallets,
@@ -3793,6 +3893,18 @@ class FinanceDatabase extends _$FinanceDatabase {
                 ),
           );
           batch.insert(objectives, syncLog.itemToUpdate,
+              mode: InsertMode.insertOrReplace);
+        } else if (syncLog.updateLogType == UpdateLogType.HstFiling) {
+          batch.update(
+            hstFilings,
+            syncLog.itemToUpdate,
+            where: (tbl) =>
+                tbl.hstFilingPk.equals(syncLog.pk) &
+                tbl.dateTimeModified.isSmallerThanValue(
+                  syncLog.transactionDateTime ?? DateTime.now(),
+                ),
+          );
+          batch.insert(hstFilings, syncLog.itemToUpdate,
               mode: InsertMode.insertOrReplace);
         }
       }

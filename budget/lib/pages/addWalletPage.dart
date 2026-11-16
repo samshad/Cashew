@@ -127,6 +127,9 @@ class _AddWalletPageState extends State<AddWalletPage> {
       homePageWidgetDisplay: widget.wallet != null
           ? widget.wallet!.homePageWidgetDisplay
           : defaultWalletHomePageWidgetDisplay,
+      // Not edited on this page yet: keep the stored values.
+      accountLast4: widget.wallet?.accountLast4,
+      closed: widget.wallet?.closed ?? false,
     );
   }
 

@@ -464,6 +464,18 @@ Future<bool> _syncData(BuildContext context) async {
       print("NEW OBJECTIVES");
       print(newObjectives);
 
+      List<HstFiling> newHstFilings =
+          await databaseSync.getAllNewHstFilings(lastSynced);
+      for (HstFiling newEntry in newHstFilings) {
+        syncLogs.add(SyncLog(
+          deleteLogType: null,
+          updateLogType: UpdateLogType.HstFiling,
+          pk: newEntry.hstFilingPk,
+          itemToUpdate: newEntry,
+          transactionDateTime: newEntry.dateTimeModified,
+        ));
+      }
+
       List<DeleteLog> deleteLogs =
           await databaseSync.getAllNewDeleteLogs(lastSynced);
 

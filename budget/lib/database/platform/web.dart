@@ -2,6 +2,8 @@
 import 'dart:typed_data';
 import 'package:budget/database/binary_string_conversion.dart';
 import 'package:budget/struct/databaseGlobal.dart';
+// Kept on purpose: switching to drift/wasm.dart changes the stored format.
+// ignore: deprecated_member_use
 import 'package:drift/web.dart';
 import 'package:budget/database/tables.dart';
 import 'package:universal_html/html.dart' as html;
